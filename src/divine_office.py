@@ -27,6 +27,17 @@ month_map = {
 }
 
 
+class Verse(object):
+    text = ""
+    syllables = []
+    stress = []
+
+    def __init__(self, text, syllables, stress):
+        self.text = text
+        self.syllables = syllables
+        self.stress = stress
+
+
 class Paragraph(object):
     lines = []
     syllables = []
@@ -55,6 +66,20 @@ class Paragraph(object):
             for syllable in verse
         ]
         self.syllables.append(syllables_no_stress)
+
+    @property
+    def verses(self):
+        if not hasattr(self, '_verses'):
+            self._verses = [
+                Verse(line, syllable, stress)
+                for line, syllable, stress in zip(
+                    self.lines,
+                    self.syllables,
+                    self.stress,
+                )
+            ]
+
+        return self._verses
 
 
 class Text(object):

@@ -1,10 +1,11 @@
-from .syllable import get_syllables
-
-
 DEFAULT_FILE_PATH = "file.ly"
 
 file_content = """
 \\version "2.12.3"
+
+\\layout {{
+  indent = #0
+}}
 
 stemOff = {{ \\hide Staff.Stem }}
 
@@ -54,7 +55,7 @@ def get_lilydata_for_pair(pair, tone):
     }
 
     syllables = [
-        get_syllables(line)
+        line.syllables
         for line in pair
     ]
     syllables = remove_strong(syllables)
@@ -77,9 +78,11 @@ def get_lilydata_for_pair(pair, tone):
     )
 
     full_notes = f"""{first_line}
+    \\bar \"|\"
     \\cadenzaOff
     \\cadenzaOn
-    {second_line}"""
+    {second_line}
+    \\bar \"|\""""
 
     lyrics = " ".join(syllables[0]) + " " + " ".join(syllables[1])
 
@@ -89,13 +92,19 @@ def get_lilydata_for_pair(pair, tone):
     }
 
 
-def build_file(lilydata, file_path=None):
+def build_file(notes, lyrics, file_path=None):
     if file_path is None:
         file_path = DEFAULT_FILE_PATH
 
+    notes = """
+    \\cadenzaOff
+    \\cadenzaOn
+    """.join(notes)
+    lyrics = " ".join(lyrics)
+
     final_content = file_content.format(
-        notes=lilydata["notes"],
-        lyrics=lilydata["lyrics"],
+        notes=notes,
+        lyrics=lyrics,
     )
     encoded_content = final_content.encode("utf8")
 
