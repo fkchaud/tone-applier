@@ -1,4 +1,7 @@
-file_path = "file.ly"
+from .syllable import get_syllables
+
+
+DEFAULT_FILE_PATH = "file.ly"
 
 file_content = """
 \\version "2.12.3"
@@ -19,26 +22,83 @@ stemOff = {{ \\hide Staff.Stem }}
 }}
 """
 
-introito = "f4 g4"
-introito_count = introito.count(' ') + 1
-tenor = "a4"
-# flexa = "g4"
-cierre = "g4 a4 f2"
-cierre_count = cierre.count(' ') + 1
+TONE_6 = {
+    "entonatio": "f4 g4",
+    "tenor": "a4",
+    "flexa": "g4",
+    "cadenza_med": "g4 a4 f2",
+    "cadenza_fin": "f4 g4( a4) g4 f2",
+}
 
-syllables = ["Te", "di", "ré", "mi", "a", "mor,", "Rey", "mí", "o"]
+TONES = {
+    'tone_6': TONE_6,
+}
 
-lyrics = " ".join(syllables)
 
-tenor_count = len(syllables) - introito_count - cierre_count
+def remove_strong(syllables):
+    return [
+        [
+            syl.replace("<strong>", "").replace("</strong>", "")
+            for syl in syl_set
+        ]
+        for syl_set in syllables
+    ]
 
-tenor_total = ' '.join([tenor] * tenor_count)
 
-notes = f"{introito} {tenor_total} {cierre}"
+def get_lilydata_for_pair(pair, tone):
+    tone_data = TONES[tone]
 
-final_content = file_content.format(notes=notes, lyrics=lyrics)
-encoded_content = final_content.encode("utf8")
+    counts = {
+        moment: values.count(' ') - values.count('(') + 1
+        for moment, values in tone_data.items()
+    }
 
-f = open(file_path, "wb")
-f.write(encoded_content)
-f.close()
+    syllables = [
+        get_syllables(line)
+        for line in pair
+    ]
+    syllables = remove_strong(syllables)
+
+    first_tenor_count = len(syllables[0]) - counts["entonatio"] - counts["cadenza_med"]
+    first_tenor = ' '.join([tone_data["tenor"]] * first_tenor_count)
+
+    first_line = (
+        tone_data["entonatio"] + " "
+        + first_tenor + " "
+        + tone_data["cadenza_med"] + " |"
+    )
+
+    second_tenor_count = len(syllables[1]) - counts["cadenza_fin"]
+    second_tenor = ' '.join([tone_data["tenor"]] * second_tenor_count)
+
+    second_line = (
+        second_tenor + " "
+        + tone_data["cadenza_fin"]
+    )
+
+    full_notes = f"""{first_line}
+    \\cadenzaOff
+    \\cadenzaOn
+    {second_line}"""
+
+    lyrics = " ".join(syllables[0]) + " " + " ".join(syllables[1])
+
+    return {
+        "notes": full_notes,
+        "lyrics": lyrics,
+    }
+
+
+def build_file(lilydata, file_path=None):
+    if file_path is None:
+        file_path = DEFAULT_FILE_PATH
+
+    final_content = file_content.format(
+        notes=lilydata["notes"],
+        lyrics=lilydata["lyrics"],
+    )
+    encoded_content = final_content.encode("utf8")
+
+    f = open(file_path, "wb")
+    f.write(encoded_content)
+    f.close()
