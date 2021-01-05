@@ -56,7 +56,7 @@ class Paragraph(object):
 
     def add_syllable_verse(self, verse):
         stress = [
-            1 if "strong" in syllable else 0
+            "1" if "strong" in syllable else "0"
             for syllable in verse
         ]
         self.stress.append("".join(stress))
