@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 
+from .syllable import get_syllables
+
 
 base_url = 'https://liturgiadelashoras.github.io/sync'
 user_agent = (
@@ -27,15 +29,32 @@ month_map = {
 
 class Paragraph(object):
     lines = []
+    syllables = []
+    stress = []
 
     def __init__(self, contents):
         self.lines = [" ".join(str(content).split()) for content in contents]
+        self.syllables = []
+        self.stress = []
 
     def __str__(self):
         return "\n".join(self.lines)
 
     def __repr__(self):
         return str(self)
+
+    def add_syllable_verse(self, verse):
+        stress = [
+            1 if "strong" in syllable else 0
+            for syllable in verse
+        ]
+        self.stress.append(stress)
+
+        syllables_no_stress = [
+            syllable.replace("<strong>", "").replace("</strong>", "")
+            for syllable in verse
+        ]
+        self.syllables.append(syllables_no_stress)
 
 
 class Text(object):
@@ -65,6 +84,14 @@ class Text(object):
 
             if content != '<br/>':
                 lines_for_paragraph.append(content)
+
+        syllables_set = get_syllables(str(self))
+        syllables_index = 0
+
+        for paragraph in self.paragraphs:
+            for line in paragraph.lines:
+                paragraph.add_syllable_verse(syllables_set[syllables_index])
+                syllables_index += 1
 
     def __str__(self):
         return "\n\n".join(str(par) for par in self.paragraphs)

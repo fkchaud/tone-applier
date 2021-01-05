@@ -10,29 +10,38 @@ user_agent = (
 headers = {'User-Agent': user_agent}
 
 
-def get_syllables(text):
+def fetch_syllable(text):
     body = {
         'fs': text,
+        'vec': 'on',
     }
 
     response = requests.post(url, data=body, headers=headers)
 
     soup = BeautifulSoup(response.content, 'html.parser')
-    tables = soup.find_all('table')
-    table = tables[1]  # second table
-    tds = table.find_all('td')
-    td = tds[0]
+    divs = soup.find_all('div', class_="g--third")
+    div = divs[1]  # second column
+    return div
 
+
+def get_syllables(text):
+    div = fetch_syllable(text)
+
+    lines = []
     splitted_phrase = ""
-    for child in td.children:
+    for child in div.children:
         str_child = str(child)
         if '\n' in str_child:
             continue
         if 'gramatical' in str_child:
             continue
         if '<br/>' in str_child:
-            break
+            if splitted_phrase:
+                lines.append(splitted_phrase)
+            splitted_phrase = ""
+            continue
+
         splitted_phrase += str_child
 
-    syllables = splitted_phrase.split('-')
+    syllables = [line.split('-') for line in lines]
     return syllables
