@@ -182,11 +182,21 @@ def get_liturgy(date, liturgy):
             get_chant = True
             chant_subtitle, chant_title = child.text.split(": ")
 
-        if 'Salmo' in str_child:
+        elif 'Salmo' in str_child:
             get_chant = True
             if " - " in str_child:
                 chant_subtitle, chant_title = child.text.split(" - ")
             else:
                 chant_subtitle = chant_title = child.text
+
+        elif 'EVANGÉLICO' in str_child:
+            # todo
+            pass
+
+        elif 'ntico' in str_child:
+            get_chant = True
+            first, second = child.text.split(": ")
+            chant_title, versicle = second.split(" - ")
+            chant_subtitle = f"Cántico - {versicle}"
 
     return lit
