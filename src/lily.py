@@ -35,6 +35,50 @@ TONES = {
     'tone_6': TONE_6,
 }
 
+SPEC_CHARS = (' ', ',', '.', '!', '?', '¡', '¿')
+
+
+def get_lyrics(pair):
+    lyrics = ""
+
+    for verse in pair:
+        low_text = verse.text.lower()
+        syllables = [s for s in verse.syllables]
+
+        for i in range(len(verse.text)):
+            first_syllable = syllables[0]
+
+            if i == 0 and verse.text[i] in SPEC_CHARS:
+                lyrics += verse.text[i]
+                continue
+
+            if not low_text[i: i + len(first_syllable)] == first_syllable:
+                continue
+
+            lyrics += verse.text[i: i + len(first_syllable)]
+
+            # overflow
+            if i + len(first_syllable) >= len(verse.text):
+                break
+
+            next_char = low_text[i + len(first_syllable)]
+            if next_char in SPEC_CHARS:
+                for char in low_text[i + len(first_syllable):]:
+                    if char not in SPEC_CHARS:
+                        break
+                    lyrics += char
+            else:
+                lyrics += ' -- '
+
+            syllables.pop(0)
+
+            if not syllables:
+                break
+
+        lyrics += " "
+
+    return lyrics
+
 
 def get_lilydata_for_pair(pair, tone):
     tone_data = TONES[tone]
@@ -44,10 +88,7 @@ def get_lilydata_for_pair(pair, tone):
         for moment, values in tone_data.items()
     }
 
-    syllables = [
-        line.syllables
-        for line in pair
-    ]
+    syllables = [line.syllables for line in pair]
 
     first_tenor_count = (
         len(syllables[0])
@@ -76,7 +117,7 @@ def get_lilydata_for_pair(pair, tone):
     \\bar \"|\"
     \\break"""
 
-    lyrics = " ".join(syllables[0]) + " " + " ".join(syllables[1])
+    lyrics = get_lyrics(pair)
 
     return {
         "notes": full_notes,
