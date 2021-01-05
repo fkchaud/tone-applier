@@ -27,8 +27,13 @@ TONE_6 = {
     "entonatio": "f4 g4",
     "tenor": "a4",
     "flexa": "g4",
-    "cadenza_med": "g4 a4 f2",
+    "cadenza_med": {
+        "0100": "g4 a4 f4 f2",
+        "010": "g4 a4 f2",
+        "01": "g4 a4( f2)",
+    },
     "cadenza_fin": "f4 g4( a4) g4 f2",
+    "cadenza_fin_stress": "0 0 1 0",
 }
 
 TONES = {
@@ -80,36 +85,62 @@ def get_lyrics(pair):
     return lyrics
 
 
-def get_lilydata_for_pair(pair, tone):
-    tone_data = TONES[tone]
+def get_notes(pair, tone):
+    first_line = get_first_line_notes(pair[0], tone)
+    second_line = get_second_line_notes(pair[1], tone)
 
+    return first_line, second_line
+
+
+def get_first_line_notes(verse, tone):
+    tone_data = TONES[tone]
     counts = {
         moment: values.count(' ') - values.count('(') + 1
-        for moment, values in tone_data.items()
+        for moment, values in tone_data.items() if isinstance(values, str)
     }
 
-    syllables = [line.syllables for line in pair]
+    cadenza = ""
+    for stress, values in tone_data["cadenza_med"].items():
+        if verse.stress.endswith(stress):
+            cadenza = values
+            break
+    cadenza_count = cadenza.count(' ') - cadenza.count('(') + 1
 
     first_tenor_count = (
-        len(syllables[0])
+        len(verse.syllables)
         - counts["entonatio"]
-        - counts["cadenza_med"]
+        - cadenza_count
     )
     first_tenor = ' '.join([tone_data["tenor"]] * first_tenor_count)
 
     first_line = (
         tone_data["entonatio"] + " "
         + first_tenor + " "
-        + tone_data["cadenza_med"] + " |"
+        + cadenza + " |"
     )
 
-    second_tenor_count = len(syllables[1]) - counts["cadenza_fin"]
+    return first_line
+
+
+def get_second_line_notes(verse, tone):
+    tone_data = TONES[tone]
+    counts = {
+        moment: values.count(' ') - values.count('(') + 1
+        for moment, values in tone_data.items()
+    }
+
+    second_tenor_count = len(verse.syllables) - counts["cadenza_fin"]
     second_tenor = ' '.join([tone_data["tenor"]] * second_tenor_count)
 
     second_line = (
         second_tenor + " "
         + tone_data["cadenza_fin"]
     )
+    return second_line
+
+
+def get_lilydata_for_pair(pair, tone):
+    first_line, second_line = get_notes(pair, tone)
 
     full_notes = f"""{first_line}
     \\bar \"|\"

@@ -59,7 +59,7 @@ class Paragraph(object):
             1 if "strong" in syllable else 0
             for syllable in verse
         ]
-        self.stress.append(stress)
+        self.stress.append("".join(stress))
 
         syllables_no_stress = [
             syllable.replace("<strong>", "").replace("</strong>", "")
