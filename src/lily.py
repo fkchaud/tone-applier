@@ -60,7 +60,11 @@ def get_lilydata_for_pair(pair, tone):
     ]
     syllables = remove_strong(syllables)
 
-    first_tenor_count = len(syllables[0]) - counts["entonatio"] - counts["cadenza_med"]
+    first_tenor_count = (
+        len(syllables[0])
+        - counts["entonatio"]
+        - counts["cadenza_med"]
+    )
     first_tenor = ' '.join([tone_data["tenor"]] * first_tenor_count)
 
     first_line = (
@@ -82,7 +86,8 @@ def get_lilydata_for_pair(pair, tone):
     \\cadenzaOff
     \\cadenzaOn
     {second_line}
-    \\bar \"|\""""
+    \\bar \"|\"
+    \\break"""
 
     lyrics = " ".join(syllables[0]) + " " + " ".join(syllables[1])
 
