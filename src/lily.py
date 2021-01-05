@@ -43,7 +43,7 @@ TONE_6 = {
         "10": "f4 g4( a4) g4 f2",
         "1": "f4 g4( a4) g4( f2)",
     },
-    "cadenza_fin_stress": "0 0 1 0",
+    "amen": "d2 f2",
 }
 
 TONES = {
@@ -134,18 +134,29 @@ def get_first_line_notes(verse, tone):
 
 def get_second_line_notes(verse, tone):
     tone_data = TONES[tone]
+    verse_stress = verse.stress
+    syllables = verse.syllables
+    extra = ""
+
+    if verse.text.endswith("Amén."):
+        verse_stress = verse_stress[:-2]
+        syllables = syllables[:-2]
+        extra = f"""
+        \\bar \"|\"
+        {tone_data["amen"]}
+        """
 
     cadenza = ""
     for stress, values in tone_data["cadenza_fin"].items():
-        if verse.stress.endswith(stress):
+        if verse_stress.endswith(stress):
             cadenza = values
             break
     cadenza_count = cadenza.count(' ') - cadenza.count('(') + 1
 
-    second_tenor_count = len(verse.syllables) - cadenza_count
+    second_tenor_count = len(syllables) - cadenza_count
     second_tenor = ' '.join([tone_data["tenor"]] * second_tenor_count)
 
-    second_line = second_tenor + " " + cadenza
+    second_line = second_tenor + " " + cadenza + extra
     return second_line
 
 
