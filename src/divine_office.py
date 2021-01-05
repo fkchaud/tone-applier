@@ -84,8 +84,11 @@ class Paragraph(object):
 
 class Text(object):
     paragraphs = []
+    title = ""
 
-    def __init__(self, contents):
+    def __init__(self, contents, title=""):
+        self.title = title
+
         br_count = 0
 
         lines_for_paragraph = []
@@ -150,16 +153,18 @@ def get_liturgy(date, liturgy):
     lit = Liturgy()
 
     get_hymn = False
+    hymn_title = ""
     for child in div.children:
         str_child = str(child)
         if '\n' == str_child:
             continue
 
         if get_hymn:
-            lit.hymn = Text(child)
+            lit.hymn = Text(child, hymn_title)
             get_hymn = False
 
         if 'Himno' in str_child:
             get_hymn = True
+            hymn_title = child.text.split(": ")[1].strip()
 
     return lit

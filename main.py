@@ -30,4 +30,10 @@ for paragraph in liturgy.hymn.paragraphs:
         notes.append(lilydata["notes"])
         lyrics.append(lilydata["lyrics"])
 
-build_file(notes, lyrics, "file_done.ly")
+build_file(
+    notes,
+    lyrics,
+    title=liturgy.hymn.title,
+    subtitle="Himno",
+    file_path="file_done.ly",
+)

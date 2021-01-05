@@ -3,6 +3,11 @@ DEFAULT_FILE_PATH = "file.ly"
 file_content = """
 \\version "2.12.3"
 
+\\header {{
+  title = "{title}"
+  subtitle = "{subtitle}"
+}}
+
 \\layout {{
   indent = #0
 }}
@@ -161,7 +166,7 @@ def get_lilydata_for_pair(pair, tone):
     }
 
 
-def build_file(notes, lyrics, file_path=None):
+def build_file(notes, lyrics, title="", subtitle="", file_path=None):
     if file_path is None:
         file_path = DEFAULT_FILE_PATH
 
@@ -172,6 +177,8 @@ def build_file(notes, lyrics, file_path=None):
     lyrics = " ".join(lyrics)
 
     final_content = file_content.format(
+        title=title,
+        subtitle=subtitle,
         notes=notes,
         lyrics=lyrics,
     )
