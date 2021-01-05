@@ -6,34 +6,41 @@ from src.lily import get_lilydata_for_pair, build_file
 
 def build_pairs(lines):
     pairs = []
-    for i in range(0, len(lines), 2):
-        pairs.append((lines[i], lines[i + 1]))
+    for i in range(0, len(lines) - 1, 2):
+        pairs.append([lines[i], lines[i + 1]])
+
+    if lines[-1] not in pairs[-1]:
+        pairs[-1].append(lines[-1])
     return pairs
 
 
 today = datetime.now()
 today = today.replace(day=4)
 liturgy = get_liturgy(today, 'visperas')
+file_idx = 0
 
-notes = []
-lyrics = []
 
-for paragraph in liturgy.hymn.paragraphs:
-    if len(paragraph.lines) % 2:
-        print("I don't know how to parse this yet, sorry")
-        break
+def build_chant(chant):
+    notes = []
+    lyrics = []
 
-    pairs = build_pairs(paragraph.verses)
+    for paragraph in chant.paragraphs:
+        pairs = build_pairs(paragraph.verses)
 
-    for pair in pairs:
-        lilydata = get_lilydata_for_pair(pair, 'tone_6')
-        notes.append(lilydata["notes"])
-        lyrics.append(lilydata["lyrics"])
+        for pair in pairs:
+            lilydata = get_lilydata_for_pair(pair, 'tone_6')
+            notes.append(lilydata["notes"])
+            lyrics.append(lilydata["lyrics"])
 
-build_file(
-    notes,
-    lyrics,
-    title=liturgy.hymn.title,
-    subtitle="Himno",
-    file_path="file_done.ly",
-)
+    build_file(
+        notes,
+        lyrics,
+        title=chant.title,
+        subtitle=chant.subtitle,
+        file_path=f"file_{file_idx}.ly",
+    )
+
+
+for chant in liturgy.chants:
+    build_chant(chant)
+    file_idx += 1

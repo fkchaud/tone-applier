@@ -32,7 +32,11 @@ stemOff = {{ \\hide Staff.Stem }}
 TONE_6 = {
     "entonatio": "f4 g4",
     "tenor": "a4",
-    "flexa": "g4",
+    "flexa": {
+        "100": "a4 g4 g2",
+        "10": "a4 g2",
+        "1": "a4( g2)",
+    },
     "cadenza_med": {
         "100": "g4 a4 f4 f2",
         "10": "g4 a4 f2",
@@ -96,10 +100,46 @@ def get_lyrics(pair):
 
 
 def get_notes(pair, tone):
-    first_line = get_first_line_notes(pair[0], tone)
-    second_line = get_second_line_notes(pair[1], tone)
+    if len(pair) == 3:
+        first_line = get_line_with_flexa(pair[0], tone)
+        second_line = get_line_med_notes(pair[1], tone)
+        third_line = get_second_line_notes(pair[2], tone)
+    else:
+        first_line = get_first_line_notes(pair[0], tone)
+        second_line = get_second_line_notes(pair[1], tone)
+        third_line = ""
 
-    return first_line, second_line
+    return [first_line, second_line, third_line]
+
+
+def get_line_with_flexa(verse, tone):
+    tone_data = TONES[tone]
+    counts = {
+        moment: values.count(' ') - values.count('(') + 1
+        for moment, values in tone_data.items() if isinstance(values, str)
+    }
+
+    flexa = ""
+    for stress, values in tone_data["flexa"].items():
+        if verse.stress.endswith(stress):
+            flexa = values
+            break
+    flexa_count = flexa.count(' ') - flexa.count('(') + 1
+
+    tenor_count = (
+        len(verse.syllables)
+        - counts["entonatio"]
+        - flexa_count
+    )
+    tenor = ' '.join([tone_data["tenor"]] * tenor_count)
+
+    line = (
+        tone_data["entonatio"] + " "
+        + tenor + " "
+        + flexa + " |"
+    )
+
+    return line
 
 
 def get_first_line_notes(verse, tone):
@@ -132,6 +172,30 @@ def get_first_line_notes(verse, tone):
     return first_line
 
 
+def get_line_med_notes(verse, tone):
+    tone_data = TONES[tone]
+
+    cadenza = ""
+    for stress, values in tone_data["cadenza_med"].items():
+        if verse.stress.endswith(stress):
+            cadenza = values
+            break
+    cadenza_count = cadenza.count(' ') - cadenza.count('(') + 1
+
+    tenor_count = (
+        len(verse.syllables)
+        - cadenza_count
+    )
+    tenor = ' '.join([tone_data["tenor"]] * tenor_count)
+
+    line = (
+        tenor + " "
+        + cadenza + " |"
+    )
+
+    return line
+
+
 def get_second_line_notes(verse, tone):
     tone_data = TONES[tone]
     verse_stress = verse.stress
@@ -161,11 +225,13 @@ def get_second_line_notes(verse, tone):
 
 
 def get_lilydata_for_pair(pair, tone):
-    first_line, second_line = get_notes(pair, tone)
+    lines = get_notes(pair, tone)
 
-    full_notes = f"""{first_line}
+    joined_lines = """
     \\bar \"|\"
-    {second_line}
+    """.join(lines)
+
+    full_notes = f"""{joined_lines}
     \\bar \"|\"
     \\break"""
 

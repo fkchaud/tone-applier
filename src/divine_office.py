@@ -37,6 +37,12 @@ class Verse(object):
         self.syllables = syllables
         self.stress = stress
 
+    def __str__(self):
+        return self.text
+
+    def __repr__(self):
+        return str(self)
+
 
 class Paragraph(object):
     lines = []
@@ -85,9 +91,12 @@ class Paragraph(object):
 class Text(object):
     paragraphs = []
     title = ""
+    subtitle = ""
 
-    def __init__(self, contents, title=""):
-        self.title = title
+    def __init__(self, contents, title="", subtitle=""):
+        self.title = title.strip()
+        self.subtitle = subtitle.strip()
+        self.paragraphs = []
 
         br_count = 0
 
@@ -129,7 +138,10 @@ class Text(object):
 
 
 class Liturgy(object):
-    hymn = []
+    chants = []
+
+    def __init__(self):
+        self.chants = []
 
 
 def get_date_url(date):
@@ -152,19 +164,29 @@ def get_liturgy(date, liturgy):
 
     lit = Liturgy()
 
-    get_hymn = False
-    hymn_title = ""
+    get_chant = False
+    chant_title = ""
+    chant_subtitle = ""
     for child in div.children:
         str_child = str(child)
         if '\n' == str_child:
             continue
 
-        if get_hymn:
-            lit.hymn = Text(child, hymn_title)
-            get_hymn = False
+        if get_chant:
+            lit.chants.append(
+                Text(child, chant_title, chant_subtitle),
+            )
+            get_chant = False
 
         if 'Himno' in str_child:
-            get_hymn = True
-            hymn_title = child.text.split(": ")[1].strip()
+            get_chant = True
+            chant_subtitle, chant_title = child.text.split(": ")
+
+        if 'Salmo' in str_child:
+            get_chant = True
+            if " - " in str_child:
+                chant_subtitle, chant_title = child.text.split(" - ")
+            else:
+                chant_subtitle = chant_title = child.text
 
     return lit
