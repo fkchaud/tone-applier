@@ -72,8 +72,6 @@ def get_lilydata_for_pair(pair, tone):
 
     full_notes = f"""{first_line}
     \\bar \"|\"
-    \\cadenzaOff
-    \\cadenzaOn
     {second_line}
     \\bar \"|\"
     \\break"""
