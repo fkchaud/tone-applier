@@ -13,6 +13,7 @@ stemOff = {{ \\hide Staff.Stem }}
   \\clef "treble"
   \\key f \\major
   \\stemOff
+  \\omit Score.TimeSignature
   \\cadenzaOn
   {notes}
   \\cadenzaOff
