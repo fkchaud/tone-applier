@@ -36,16 +36,6 @@ TONES = {
 }
 
 
-def remove_strong(syllables):
-    return [
-        [
-            syl.replace("<strong>", "").replace("</strong>", "")
-            for syl in syl_set
-        ]
-        for syl_set in syllables
-    ]
-
-
 def get_lilydata_for_pair(pair, tone):
     tone_data = TONES[tone]
 
@@ -58,7 +48,6 @@ def get_lilydata_for_pair(pair, tone):
         line.syllables
         for line in pair
     ]
-    syllables = remove_strong(syllables)
 
     first_tenor_count = (
         len(syllables[0])
