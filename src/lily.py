@@ -28,11 +28,15 @@ TONE_6 = {
     "tenor": "a4",
     "flexa": "g4",
     "cadenza_med": {
-        "0100": "g4 a4 f4 f2",
-        "010": "g4 a4 f2",
-        "01": "g4 a4( f2)",
+        "100": "g4 a4 f4 f2",
+        "10": "g4 a4 f2",
+        "1": "g4 a4( f2)",
     },
-    "cadenza_fin": "f4 g4( a4) g4 f2",
+    "cadenza_fin": {
+        "100": "f4 g4( a4) g4 f4 f2",
+        "10": "f4 g4( a4) g4 f2",
+        "1": "f4 g4( a4) g4( f2)",
+    },
     "cadenza_fin_stress": "0 0 1 0",
 }
 
@@ -124,18 +128,18 @@ def get_first_line_notes(verse, tone):
 
 def get_second_line_notes(verse, tone):
     tone_data = TONES[tone]
-    counts = {
-        moment: values.count(' ') - values.count('(') + 1
-        for moment, values in tone_data.items()
-    }
 
-    second_tenor_count = len(verse.syllables) - counts["cadenza_fin"]
+    cadenza = ""
+    for stress, values in tone_data["cadenza_fin"].items():
+        if verse.stress.endswith(stress):
+            cadenza = values
+            break
+    cadenza_count = cadenza.count(' ') - cadenza.count('(') + 1
+
+    second_tenor_count = len(verse.syllables) - cadenza_count
     second_tenor = ' '.join([tone_data["tenor"]] * second_tenor_count)
 
-    second_line = (
-        second_tenor + " "
-        + tone_data["cadenza_fin"]
-    )
+    second_line = second_tenor + " " + cadenza
     return second_line
 
 
