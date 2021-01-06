@@ -122,6 +122,9 @@ class Text(object):
             if content != '<br/>':
                 lines_for_paragraph.append(content)
 
+            if "<font" in content:
+                break
+
         syllables_set = get_syllables(str(self))
         syllables_index = 0
 
@@ -194,9 +197,11 @@ def get_liturgy(date, liturgy):
             pass
 
         elif 'ntico' in str_child:
-            get_chant = True
-            first, second = child.text.split(": ")
-            chant_title, versicle = second.split(" - ")
-            chant_subtitle = f"Cántico - {versicle}"
+            # todo
+            pass
+            # get_chant = True
+            # first, second = child.text.split(": ")
+            # chant_title, versicle = second.split(" - ")
+            # chant_subtitle = f"Cántico - {versicle}"
 
     return lit

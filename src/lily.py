@@ -54,7 +54,7 @@ TONES = {
     'tone_6': TONE_6,
 }
 
-SPEC_CHARS = (' ', ',', '.', '!', '?', '¡', '¿')
+SPEC_CHARS = (' ', ',', '.', '!', '?', '¡', '¿', ':', '-', ';')
 
 
 def get_lyrics(pair):
@@ -62,37 +62,26 @@ def get_lyrics(pair):
 
     for verse in pair:
         low_text = verse.text.lower()
+        normal_text = verse.text
         syllables = [s for s in verse.syllables]
 
-        for i in range(len(verse.text)):
-            first_syllable = syllables[0]
-
-            if i == 0 and verse.text[i] in SPEC_CHARS:
-                lyrics += verse.text[i]
+        while normal_text:
+            if normal_text[0] in SPEC_CHARS:
+                lyrics += normal_text[0]
+                normal_text = normal_text[1:]
+                low_text = low_text[1:]
                 continue
 
-            if not low_text[i: i + len(first_syllable)] == first_syllable:
-                continue
+            syl = syllables[0]
 
-            lyrics += verse.text[i: i + len(first_syllable)]
+            if low_text.startswith(syl):
+                lyrics += normal_text[0: len(syl)]
+                normal_text = normal_text[len(syl):]
+                low_text = low_text[len(syl):]
+                syllables.pop(0)
 
-            # overflow
-            if i + len(first_syllable) >= len(verse.text):
-                break
-
-            next_char = low_text[i + len(first_syllable)]
-            if next_char in SPEC_CHARS:
-                for char in low_text[i + len(first_syllable):]:
-                    if char not in SPEC_CHARS:
-                        break
-                    lyrics += char
-            else:
-                lyrics += ' -- '
-
-            syllables.pop(0)
-
-            if not syllables:
-                break
+                if normal_text and normal_text[0] not in SPEC_CHARS:
+                    lyrics += ' -- '
 
         lyrics += " "
 
