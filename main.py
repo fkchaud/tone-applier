@@ -15,7 +15,6 @@ def build_pairs(lines):
 
 
 today = datetime.now()
-today = today.replace(day=4)
 liturgy = get_liturgy(today, 'visperas')
 file_idx = 0
 
