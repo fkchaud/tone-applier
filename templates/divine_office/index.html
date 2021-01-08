@@ -1,0 +1,14 @@
+<h1>Tone Applier</h1>
+
+{% if error_message %}
+    <p>{{error_message}}</p>
+{% endif %}
+
+<form action="{% url 'find' %}" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <p>
+        <input type="submit" value="Obtener">
+    </p>
+</form>
+

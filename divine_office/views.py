@@ -2,8 +2,11 @@ from datetime import datetime
 from typing import NoReturn
 
 from django.http import HttpResponse
+from django.urls import reverse_lazy
+from django.views.generic import FormView
 
 from divine_office.connect import get_liturgy
+from divine_office.forms import FindLiturgyForm
 from divine_office.models import (
     Text,
     Verse,
@@ -12,6 +15,21 @@ from lilypond.builder import (
     build_file,
     get_lilydata_for_pair,
 )
+
+
+class FindLiturgy(FormView):
+    template_name = 'divine_office/index.html'
+    form_class = FindLiturgyForm
+    success_url = reverse_lazy('dummy')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # import ipdb; ipdb.set_trace()
+        return context
+
+
+def dummy(request):
+    return HttpResponse("Dummy")
 
 
 # Create your views here.
