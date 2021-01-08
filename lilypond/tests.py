@@ -1,13 +1,14 @@
-import unittest
 from unittest.mock import Mock
 
-from .lily import (
+from django.test import TestCase
+
+from lilypond.notes import (
     get_first_line_notes,
     get_second_line_notes,
 )
 
 
-class TestFirstLineNotes(unittest.TestCase):
+class TestFirstLineNotes(TestCase):
 
     tone = 'tone_6'
 
@@ -45,7 +46,7 @@ class TestFirstLineNotes(unittest.TestCase):
         self.assertEqual(notes, expected_notes)
 
 
-class TestSecondLineNotes(unittest.TestCase):
+class TestSecondLineNotes(TestCase):
 
     tone = 'tone_6'
 
@@ -81,7 +82,3 @@ class TestSecondLineNotes(unittest.TestCase):
         notes = get_second_line_notes(verse, self.tone)
         expected_notes = 'a4 a4 a4 a4 a4 a4 a4 a4 a4 a4 f4 g4( a4) g4 f4 f2'
         self.assertEqual(notes, expected_notes)
-
-
-if __name__ == '__main__':
-    unittest.main()

@@ -1,30 +1,37 @@
 import requests
 from bs4 import BeautifulSoup
+from bs4.element import PageElement
 
 
-url = 'https://www.separarensilabas.com/'
-user_agent = (
+URL = 'https://www.separarensilabas.com/'
+USER_AGENT = (
     'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 '
     '(KHTML, like Gecko) Chrome/36.0.1985.143 Safari/537.36'
 )
-headers = {'User-Agent': user_agent}
+HEADERS = {'User-Agent': USER_AGENT}
 
 
-def fetch_syllable(text):
+def fetch_syllable(text: str) -> PageElement:
     body = {
         'fs': text,
         'vec': 'on',
     }
 
-    response = requests.post(url, data=body, headers=headers)
+    response = requests.post(URL, data=body, headers=HEADERS)
 
     soup = BeautifulSoup(response.content, 'html.parser')
     divs = soup.find_all('div', class_="g--third")
-    div = divs[1]  # second column
+    try:
+        div = divs[1]  # second column
+    except Exception as exc:
+        import ipdb
+        ipdb.set_trace()
+        print(exc)
+
     return div
 
 
-def get_syllables(text):
+def get_syllables(text: str) -> list[list[str]]:
     div = fetch_syllable(text)
 
     lines = []
