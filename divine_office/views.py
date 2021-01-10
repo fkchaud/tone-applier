@@ -3,7 +3,10 @@ from typing import NoReturn
 
 from django.http import HttpResponse
 from django.urls import reverse_lazy
-from django.views.generic import FormView
+from django.views.generic import (
+    FormView,
+    TemplateView,
+)
 
 from divine_office.connect import get_liturgy
 from divine_office.forms import FindLiturgyForm
@@ -20,11 +23,18 @@ from lilypond.builder import (
 class FindLiturgy(FormView):
     template_name = 'divine_office/index.html'
     form_class = FindLiturgyForm
-    success_url = reverse_lazy('dummy')
+    success_url = reverse_lazy('show-liturgy')
+
+    def form_valid(self, form: FindLiturgyForm):
+
+
+
+class ShowLiturgyView(TemplateView):
+    template_name = "divine_office/show.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # import ipdb; ipdb.set_trace()
+        import ipdb; ipdb.set_trace()
         return context
 
 

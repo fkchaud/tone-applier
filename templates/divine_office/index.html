@@ -4,7 +4,7 @@
     <p>{{error_message}}</p>
 {% endif %}
 
-<form action="{% url 'find' %}" method="post">
+<form action="{% url 'find-liturgy' %}" method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <p>
