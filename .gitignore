@@ -133,3 +133,6 @@ dmypy.json
 # lilypond
 *.pdf
 *.ly
+
+# own statics
+statics/file_*.png

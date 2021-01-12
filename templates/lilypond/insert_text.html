@@ -1,0 +1,27 @@
+<div style="text-align: center;">
+    <h1>Tone Applier</h1>
+</div>
+
+{% if error_message %}
+    <p>{{error_message}}</p>
+{% endif %}
+
+<div style="width: 49%; display: inline-block; vertical-align: top; text-align: right;">
+    <form action="{% url 'apply-to-text' %}" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <p>
+            <input type="submit" value="Aplicar">
+        </p>
+    </form>
+</div>
+
+{% if files %}
+    {% load static %}
+
+    <div style="width: 49%; display: inline-block; vertical-align: top;">
+        {% for file in files %}
+            <img src="{% static file %}" />
+        {% endfor %}
+    </div>
+{% endif %}

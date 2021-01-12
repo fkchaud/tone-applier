@@ -21,5 +21,6 @@ from django.urls import (
 
 urlpatterns = [
     path('divine_office/', include('divine_office.urls')),
+    path('lilypond/', include('lilypond.urls')),
     path('admin/', admin.site.urls),
 ]

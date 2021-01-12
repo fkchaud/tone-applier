@@ -1,6 +1,11 @@
+from glob import glob
+from subprocess import run
 from typing import NoReturn
 
-from divine_office.models import Verse
+from divine_office.models import (
+  Text,
+  Verse,
+)
 from lilypond.lyrics import get_lyrics
 from lilypond.notes import get_notes
 
@@ -83,4 +88,46 @@ def get_lilydata_for_pair(pair: list[Verse], tone: str) -> dict[str, str]:
     return {
         "notes": full_notes,
         "lyrics": lyrics,
+    }
+
+
+def build_pairs(lines: list[Verse]) -> list[list[Verse]]:
+    pairs = []
+    for i in range(0, len(lines) - 1, 2):
+        pairs.append([lines[i], lines[i + 1]])
+
+    if lines[-1] not in pairs[-1]:
+        pairs[-1].append(lines[-1])
+    return pairs
+
+
+def build_chant(chant: Text, file_path: str, tone: str) -> dict:
+    notes = []
+    lyrics = []
+
+    for paragraph in chant.paragraphs:
+        pairs = build_pairs(paragraph.verses)
+
+        for pair in pairs:
+            lilydata = get_lilydata_for_pair(pair, tone)
+            notes.append(lilydata["notes"])
+            lyrics.append(lilydata["lyrics"])
+
+    build_file(
+        notes,
+        lyrics,
+        title=chant.title,
+        subtitle=chant.subtitle,
+        file_path=file_path,
+    )
+
+    run(['lilypond', '--png', '-o', 'statics', file_path], check=True)
+    file_path_no_ext = file_path.rsplit('.')[0]
+
+    pngs = [
+      file.replace('statics\\', '')
+      for file in glob(f'statics/{file_path_no_ext}*.png')
+    ]
+    return {
+      'files': pngs,
     }

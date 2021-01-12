@@ -71,7 +71,7 @@ class Text:
 
     def __init__(
         self,
-        contents: list[str],
+        contents: str,
         title: str = "",
         subtitle: str = "",
     ):
@@ -79,32 +79,18 @@ class Text:
         self.subtitle = subtitle.strip()
         self.paragraphs = []
 
-        br_count = 0
-
         lines_for_paragraph = []
+        lines = contents.splitlines() + ['']
 
-        for content in contents:
-            content = str(content)
-            if content == '\n':
-                continue
-
-            if content == '<br/>':
-                br_count += 1
-            else:
-                br_count = 0
-
-            if br_count == 2:
+        for line in lines:
+            if line == '':
                 self.paragraphs.append(
                     Paragraph(lines_for_paragraph),
                 )
                 lines_for_paragraph.clear()
                 continue
 
-            if content != '<br/>':
-                lines_for_paragraph.append(content)
-
-            if "<font" in content:
-                break
+            lines_for_paragraph.append(line)
 
         syllables_set = get_syllables(str(self))
         syllables_index = 0
