@@ -19,6 +19,28 @@ TONE_6 = {
     "amen": "d2 f2",
 }
 
+TONE_2 = {
+    "entonatio": "c4 d4",
+    "tenor": "f4",
+    "flexa": {
+        "100": "f4 d4 d2",
+        "10": "f4 d2",
+        "1": "f4( d2)",
+    },
+    "cadenza_med": {
+        "100": "g4 f4 f2",
+        "10": "g4 f2",
+        "1": "g4( f2)",
+    },
+    "cadenza_fin": {
+        "100": "e4 c4 d4 d2",
+        "10": "e4 c4( d4) d2",
+        "1": "e4 c4( d2)",
+    },
+    "amen": "c4( d4) d2",
+}
+
 TONES = {
+    'tone_2': TONE_2,
     'tone_6': TONE_6,
 }
