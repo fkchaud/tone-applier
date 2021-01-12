@@ -72,8 +72,8 @@ def build_file(
     f.close()
 
 
-def get_lilydata_for_pair(pair: list[Verse], tone: str) -> dict[str, str]:
-    lines = get_notes(pair, tone)
+def get_lilydata_for_pair(pair: list[Verse], tone: str, is_first: bool) -> dict[str, str]:
+    lines = get_notes(pair, tone, is_first)
 
     joined_lines = """
     \\bar \"|\"
@@ -105,13 +105,17 @@ def build_chant(chant: Text, file_path: str, tone: str) -> dict:
     notes = []
     lyrics = []
 
+    # not sure if it's per chant or per paragraph
+    # if it's per paragraph, move inside the for
+    is_first = True
     for paragraph in chant.paragraphs:
         pairs = build_pairs(paragraph.verses)
 
         for pair in pairs:
-            lilydata = get_lilydata_for_pair(pair, tone)
+            lilydata = get_lilydata_for_pair(pair, tone, is_first)
             notes.append(lilydata["notes"])
             lyrics.append(lilydata["lyrics"])
+            is_first = False
 
     build_file(
         notes,
