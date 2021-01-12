@@ -27,7 +27,7 @@ DEFAULT_FILE_CONTENT = """
 
 stemOff = {{ \\hide Staff.Stem }}
 
-\\relative c' {{
+\\absolute {{
   \\clef "treble"
   \\key f \\major
   \\stemOff

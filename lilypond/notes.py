@@ -4,11 +4,11 @@ from lilypond.tones import TONES
 
 def get_notes(pair: tuple[Verse], tone: str, is_first: bool = False) -> list[str]:
     if len(pair) == 3:
-        first_line = get_line_notes(pair[0], "flexa", tone, is_first)
+        first_line = get_line_notes(pair[0], "flexa", tone, has_entonatio=is_first)
         second_line = get_line_notes(pair[1], "cadenza_med", tone)
         third_line = get_line_notes(pair[2], "cadenza_fin", tone)
     else:
-        first_line = get_line_notes(pair[0], "cadenza_med", tone, is_first)
+        first_line = get_line_notes(pair[0], "cadenza_med", tone, has_entonatio=is_first)
         second_line = get_line_notes(pair[1], "cadenza_fin", tone)
         third_line = ""
 
@@ -55,6 +55,11 @@ def get_line_notes(
         if verse_stress.endswith(stress):
             ending = values
             break
+    if not ending:
+        raise ValueError(
+            "Algunos versos tienen sílabas no compatibles con el tono seleccionado. "
+            "Intente con otro tono."
+        )
     ending_count = ending.count(' ') - ending.count('(') + 1
 
     tenor_count = len(syllables) - ending_count - opening_count

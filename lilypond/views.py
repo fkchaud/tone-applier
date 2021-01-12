@@ -17,11 +17,15 @@ class ApplyToTextView(FormView):
         chant = Text(contents=text)
         file_name = f'file_{randint(0,999999)}.ly'
 
-        result = build_chant(chant, file_name, tone)
+        try:
+            result = build_chant(chant, file_name, tone)
+        except ValueError as exc:
+            form.add_error(field=None, error=exc.args[0])
+            result = {}
 
         return self.render_to_response(
             self.get_context_data(
                 form=form,
-                files=result['files'],
+                files=result.get('files', []),
             ),
         )
